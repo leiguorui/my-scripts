@@ -32,8 +32,7 @@ USERNAME  ALL=(ALL:ALL) ALL
 sudo /etc/init.d/ssh restart
 Logout of your instance (exit) and try your new login without the .pem file:
 
-$ ssh USERNAME@ec2-________.compute-1.amazonaws.com
-USERNAME@ec2-________.compute-1.amazonaws.com's password:
+$ ssh USERNAME@YOUR_INSTANCE_IP
 
 
 ####################################   设置本地时间   ##########################
@@ -47,7 +46,35 @@ sudo ntpdate ntp.ubuntu.com
 ####################################   安装mysql   ####################################
 
 sudo apt-get install mysql-server
-sudo apt-get install mysql-client
+
+####远程连接mysql
+
+#Config file changes are required to enable connections via localhost.
+#
+#To connect through remote IPs, Login as a "root" user and run the below queries in mysql.
+
+mysql -u root -p
+
+CREATE USER 'your_username'@'localhost' IDENTIFIED BY 'your_password';
+
+GRANT ALL PRIVILEGES ON *.* TO 'your_username'@'localhost' WITH GRANT OPTION;
+
+CREATE USER 'your_username'@'%' IDENTIFIED BY 'your_password';
+
+GRANT ALL PRIVILEGES ON *.* TO 'your_username'@'%' WITH GRANT OPTION;
+
+FLUSH PRIVILEGES;
+
+#This will create a new user that is accessible on localhost as well as from remote IPs.
+#
+#Also comment the below line from your my.cnf file located in /etc/mysql/my.cnf
+
+#bind-address = 127.0.0.1
+#Restart your mysql using
+
+sudo service mysql restart
+
+#Now you should be able to connect remotely to your mysql.
 
 ####################################   安装jdk   ####################################
 
